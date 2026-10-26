@@ -11,7 +11,7 @@
 
 ## Enlaces — Hito 1
 
-- **Prototipo navegable:** https://claude.ai/artifact/GVKR1kge7CbDKUdRSczxxp
+- **Prototipo navegable:** https://matias-nicolasdf21.github.io/articla/prototipo_articla_fuente.html
 - **Documento de propuesta (PDF):** `docs/Articla_Propuesta_Hito1.pdf`
 - **Láminas de la presentación (PDF):** `docs/Articla_Laminas_Hito1.pdf`
 - **Mapa del producto:** `docs/mapa_producto.png`
