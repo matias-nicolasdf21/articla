@@ -19,7 +19,7 @@
 
 ## Qué es Articla
 
-Asistente legal conversacional que responde preguntas de orientación jurídica en lenguaje simple, citando siempre el artículo exacto de la ley que respalda la respuesta. El corpus se construye con el texto oficial de LeyChile (Biblioteca del Congreso Nacional, dominio público) y, como fuente complementaria y solo con autorización, libros de la Facultad de Derecho de la Universidad de Chile.
+Asistente legal conversacional que responde preguntas de orientación jurídica en lenguaje simple, citando siempre el artículo exacto de la ley que respalda la respuesta. El corpus se construye con el texto oficial de LeyChile (Biblioteca del Congreso Nacional). Por ahora usamos solo el texto oficial de LeyChile, que es público. No usamos libros.
 
 ## Arquitectura (resumen)
 

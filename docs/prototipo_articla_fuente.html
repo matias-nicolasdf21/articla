@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Articla — asistente legal con fuentes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#101B2D;
+    --ink-soft:#3C4A63;
+    --paper:#F6F7F4;
+    --paper-raised:#FFFFFF;
+    --line: rgba(16,27,45,0.13);
+    --brass:#A9822E;
+    --brass-deep:#7C5E1E;
+    --verified:#2F6B4F;
+    --verified-bg:#E8F1EB;
+    --focus:#1D4ED8;
+    font-family:'Inter', -apple-system, sans-serif;
+  }
+  :root:not([data-theme="light"]){
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#EDEFEA;
+      --ink-soft:#B7C0D1;
+      --paper:#0E1420;
+      --paper-raised:#161E2E;
+      --line: rgba(237,239,234,0.14);
+      --verified-bg:#12261C;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#EDEFEA;
+    --ink-soft:#B7C0D1;
+    --paper:#0E1420;
+    --paper-raised:#161E2E;
+    --line: rgba(237,239,234,0.14);
+    --verified-bg:#12261C;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+  button{font-family:inherit;}
+
+  .shell{
+    display:grid;
+    grid-template-columns: 240px 1fr;
+    min-height:100%;
+  }
+  @media (max-width: 760px){
+    .shell{grid-template-columns: 1fr;}
+    .nav{
+      position:sticky; top:0; z-index:20;
+      padding-top:calc(10px + env(safe-area-inset-top,0px));
+      border-bottom:1px solid var(--line);
+      border-right:none;
+      flex-direction:row;
+      align-items:center;
+      overflow-x:auto;
+    }
+    .nav .brand{margin-bottom:0;margin-right:18px;flex-shrink:0;}
+    .nav ul{display:flex;gap:4px;flex-wrap:nowrap;}
+    .nav .foot{display:none;}
+  }
+
+  .nav{
+    border-right:1px solid var(--line);
+    padding:28px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:26px;
+    padding:0 6px;
+  }
+  .brand .mark{
+    width:30px;height:30px;border-radius:7px;
+    background:var(--ink); color:var(--paper);
+    display:grid; place-items:center;
+    font-family:'Source Serif 4', serif; font-weight:700; font-size:16px;
+    flex-shrink:0;
+  }
+  .brand .word{font-family:'Source Serif 4', serif; font-weight:600; font-size:19px; letter-spacing:0.2px;}
+  .nav ul{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:2px;}
+  .nav li button{
+    width:100%;
+    text-align:left;
+    background:transparent;
+    border:none;
+    color:var(--ink-soft);
+    font-size:14.5px;
+    font-weight:500;
+    padding:10px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    white-space:nowrap;
+  }
+  .nav li button:hover{background:var(--line);}
+  .nav li button.active{
+    background:var(--ink);
+    color:var(--paper);
+  }
+  .nav li button:focus-visible, button:focus-visible, input:focus-visible, .chip:focus-visible{
+    outline:2.5px solid var(--focus); outline-offset:2px;
+  }
+  .nav .foot{
+    margin-top:auto;
+    font-size:12px;
+    color:var(--ink-soft);
+    padding:0 6px;
+    line-height:1.5;
+  }
+
+  main{
+    padding: clamp(20px,4vw,56px);
+    max-width:920px;
+  }
+  .screen{display:none;}
+  .screen.active{display:block; animation:rise .3s ease;}
+  @keyframes rise{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+  @media (prefers-reduced-motion:reduce){.screen.active{animation:none;}}
+
+  .eyebrow{
+    font-size:13px; color:var(--brass-deep); font-weight:600; margin-bottom:10px;
+  }
+  h1.hero-title{
+    font-family:'Source Serif 4', serif;
+    font-weight:600;
+    font-size:clamp(30px,4vw,46px);
+    line-height:1.12;
+    margin:0 0 18px;
+    max-width:14ch;
+  }
+  .lede{
+    font-size:17px; line-height:1.65; color:var(--ink-soft); max-width:56ch; margin:0 0 30px;
+  }
+  .cta-row{display:flex; gap:12px; flex-wrap:wrap; margin-bottom:44px;}
+  .btn{
+    border:none; border-radius:9px; padding:13px 20px; font-size:15px; font-weight:600;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--ink); color:var(--paper);}
+  .btn-secondary{background:transparent; color:var(--ink); border:1px solid var(--line);}
+  .btn-primary:hover{opacity:.88;}
+  .btn-secondary:hover{background:var(--line);}
+
+  .sample-q{
+    display:flex; flex-direction:column; gap:0; border:1px solid var(--line); border-radius:12px; overflow:hidden;
+    max-width:620px; background:var(--paper-raised);
+  }
+  .sample-q button{
+    display:block; width:100%; text-align:left; background:none; border:none;
+    padding:16px 18px; font-size:15px; color:var(--ink); cursor:pointer;
+    border-bottom:1px solid var(--line);
+  }
+  .sample-q button:last-child{border-bottom:none;}
+  .sample-q button:hover{background:var(--line);}
+  .sample-q .label{font-size:12.5px; color:var(--ink-soft); font-weight:600; margin:26px 0 10px;}
+
+  .stats{display:flex; gap:34px; flex-wrap:wrap; margin:44px 0 6px; padding-top:26px; border-top:1px solid var(--line);}
+  .stat .n{font-family:'Source Serif 4', serif; font-size:26px; font-weight:600;}
+  .stat .l{font-size:12.5px; color:var(--ink-soft); max-width:20ch; margin-top:2px;}
+
+  /* chat screen */
+  .msg{max-width:640px; margin-bottom:22px;}
+  .msg-user{
+    margin-left:auto; background:var(--ink); color:var(--paper);
+    padding:12px 16px; border-radius:14px 14px 4px 14px; font-size:15px; max-width:70%;
+    width:fit-content;
+  }
+  .msg-row-user{display:flex;}
+  .msg-assistant{
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:4px 14px 14px 14px;
+    padding:18px 20px; font-size:15.5px; line-height:1.6;
+  }
+  .cite-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:14px;}
+  .chip{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--verified-bg); color:var(--verified);
+    border:none; border-radius:20px; padding:7px 13px; font-size:12.5px; font-weight:600;
+    cursor:pointer;
+  }
+  .chip:hover{filter:brightness(0.95);}
+  .chip .dot{width:6px;height:6px;border-radius:50%;background:var(--verified);}
+  .composer{
+    max-width:640px; display:flex; gap:10px; border:1px solid var(--line); border-radius:12px;
+    padding:8px 8px 8px 16px; background:var(--paper-raised); margin-top:30px;
+  }
+  .composer input{
+    flex:1; border:none; background:none; font-size:15px; color:var(--ink); outline:none;
+  }
+  .composer input::placeholder{color:var(--ink-soft);}
+  .composer button{background:var(--ink); color:var(--paper); border:none; border-radius:8px; padding:10px 16px; font-weight:600; cursor:pointer; font-size:14px;}
+  .disclaimer{
+    max-width:640px; font-size:12.5px; color:var(--ink-soft); margin-top:14px; line-height:1.5;
+  }
+
+  /* fuente detail */
+  .source-card{
+    border:1px solid var(--line); border-radius:14px; padding:26px 28px; max-width:640px; background:var(--paper-raised);
+  }
+  .source-tag{font-size:12.5px; font-weight:600; color:var(--verified); background:var(--verified-bg); display:inline-block; padding:5px 11px; border-radius:20px; margin-bottom:16px;}
+  .source-card h2{font-family:'Source Serif 4', serif; font-size:22px; margin:0 0 4px;}
+  .source-meta{font-size:13px; color:var(--ink-soft); margin-bottom:18px;}
+  .source-text{font-size:15px; line-height:1.75; color:var(--ink);}
+  .source-note{
+    margin-top:20px; font-size:12.5px; color:var(--ink-soft); border-top:1px solid var(--line); padding-top:14px;
+  }
+  .back-link{display:inline-flex; align-items:center; gap:6px; font-size:13.5px; color:var(--ink-soft); background:none; border:none; cursor:pointer; margin-bottom:22px; padding:0;}
+  .back-link:hover{color:var(--ink);}
+
+  /* historial */
+  .hist-item{
+    display:flex; justify-content:space-between; align-items:center; gap:16px;
+    padding:16px 0; border-bottom:1px solid var(--line); max-width:680px; cursor:pointer; background:none; border-left:none;border-right:none;border-top:none; width:100%; text-align:left;
+  }
+  .hist-item:hover .hist-q{color:var(--brass-deep);}
+  .hist-q{font-size:15px; font-weight:500; margin-bottom:4px;}
+  .hist-date{font-size:12.5px; color:var(--ink-soft);}
+  .hist-status{font-size:12px; font-weight:600; color:var(--verified); background:var(--verified-bg); padding:4px 10px; border-radius:20px; flex-shrink:0;}
+
+  h2.section-title{font-family:'Source Serif 4', serif; font-size:26px; font-weight:600; margin:0 0 8px;}
+  p.section-sub{color:var(--ink-soft); font-size:14.5px; margin:0 0 30px; max-width:52ch;}
+
+  .bubble-note{max-width:640px; background:var(--paper-raised); border:1px dashed var(--line); border-radius:4px 14px 14px 14px; padding:16px 20px; font-size:15px; line-height:1.6; color:var(--ink-soft);}
+  .form-row{display:flex; flex-direction:column; gap:6px; margin-bottom:16px; max-width:420px;}
+  .form-row label{font-size:13px; color:var(--ink-soft); font-weight:600;}
+  .form-row input{border:1px solid var(--line); border-radius:8px; padding:11px 12px; background:var(--paper-raised); color:var(--ink); font-size:15px;}
+  .btn-danger{background:transparent; color:#B3261E; border:1px solid #B3261E;}
+  .btn-danger:hover{background:rgba(179,38,30,.08);}
+  .panel{border:1px solid var(--line); border-radius:14px; padding:24px 26px; max-width:640px; background:var(--paper-raised); margin-bottom:22px;}
+  .panel h3{font-family:'Source Serif 4', serif; font-size:19px; margin:0 0 8px;}
+  .panel p{font-size:15px; line-height:1.65; color:var(--ink-soft); margin:0 0 10px;}
+  .panel ul{margin:8px 0 0; padding-left:20px; color:var(--ink-soft); font-size:15px; line-height:1.7;}
+  .ficha dl{display:grid; grid-template-columns:150px 1fr; gap:10px 16px; margin:0; font-size:15px;}
+  .ficha dt{color:var(--ink-soft); font-weight:600; font-size:13.5px;}
+  .ficha dd{margin:0;}
+  .tag-warn{font-size:12.5px; font-weight:600; color:var(--brass-deep); background:rgba(169,130,46,.14); display:inline-block; padding:5px 11px; border-radius:20px; margin-bottom:16px;}
+  .empty{color:var(--ink-soft); font-size:15px; padding:18px 0;}
+</style>
+</head>
+<body>
+<div class="shell">
+  <nav class="nav">
+    <div class="brand"><div class="mark">A</div><div class="word">Articla</div></div>
+    <ul>
+      <li><button class="nav-btn active" data-screen="inicio">Inicio</button></li>
+      <li><button class="nav-btn" data-screen="chat">Preguntar</button></li>
+      <li><button class="nav-btn" data-screen="historial">Historial</button></li>
+      <li><button class="nav-btn" data-screen="fuentes">Biblioteca de fuentes</button></li>
+      <li><button class="nav-btn" data-screen="cuenta">Cuenta</button></li>
+      <li><button class="nav-btn" data-screen="aviso">Aviso legal</button></li>
+    </ul>
+    <div class="foot">Prototipo · Hito 1<br>Matías del Fierro · Camilo González</div>
+  </nav>
+
+  <main>
+    <!-- INICIO -->
+    <section class="screen active" id="screen-inicio">
+      <div class="eyebrow">Asistente legal con fuentes verificables</div>
+      <h1 class="hero-title">La ley chilena, explicada con el artículo exacto que la respalda.</h1>
+      <p class="lede">Para cualquier persona en Chile que enfrenta una duda legal cotidiana y no tiene acceso rápido ni económico a orientación jurídica, Articla entrega una respuesta clara en menos de un minuto, citando el artículo exacto de la ley chilena que la respalda.</p>
+      <div class="cta-row">
+        <button class="btn btn-primary" data-chat="arriendo">Hacer una pregunta</button>
+        <button class="btn btn-secondary" data-goto="fuentes">Ver qué fuentes usa</button>
+      </div>
+      <div class="label" style="font-size:12.5px;color:var(--ink-soft);font-weight:600;margin:0 0 10px;">Prueba con una pregunta real</div>
+      <div class="sample-q">
+        <button data-chat="arriendo">Mi arrendador quiere subirme el arriendo a mitad de contrato, ¿puede hacerlo?</button>
+        <button data-chat="despido">Me despidieron sin aviso previo, ¿qué me corresponde?</button>
+        <button data-chat="consumo">Compré algo con falla y la tienda no quiere devolverme la plata, ¿qué hago?</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="n">192.049</div><div class="l">orientaciones jurídicas atendió en 2019 solo la CAJ Biobío</div></div>
+        <div class="stat"><div class="n">21%</div><div class="l">de las personas sin formación legal identifica la función del Poder Judicial</div></div>
+        <div class="stat"><div class="n">57% vs 4%</div><div class="l">cree que una persona de altos ingresos accede a un juicio justo, frente a bajos ingresos</div></div>
+      </div>
+    </section>
+
+    <!-- CHAT -->
+    <section class="screen" id="screen-chat">
+      <h2 class="section-title">Preguntar</h2>
+      <p class="section-sub">Escribe tu duda en lenguaje simple. Articla busca en los códigos y leyes cargados y responde citando el artículo exacto.</p>
+      <div id="thread"></div>
+      <div class="composer">
+        <input type="text" id="composerInput" placeholder="Escribe tu pregunta legal..." aria-label="Escribe tu pregunta legal">
+        <button type="button" id="sendBtn">Enviar</button>
+      </div>
+      <p class="disclaimer">Articla entrega orientación general basada en fuentes legales chilenas y no reemplaza la asesoría de un abogado o abogada. Prototipo del Hito 1: solo la primera pregunta de ejemplo tiene respuesta de demostración; aún no hay un motor de IA conectado. No escribas datos personales (RUT, direcciones).</p>
+    </section>
+
+    <!-- FUENTE: Ley 18.101 art. 1 -->
+    <section class="screen" id="screen-fuente-arriendo">
+      <button class="back-link" data-chat="arriendo">← Volver a la conversación</button>
+      <div class="source-card">
+        <span class="source-tag">Texto literal · LeyChile (BCN)</span>
+        <h2>Ley N.º 18.101, artículo 1 (inciso primero)</h2>
+        <div class="source-meta">Fija normas especiales sobre arrendamiento de predios urbanos · Biblioteca del Congreso Nacional</div>
+        <div class="source-text">El contrato de arrendamiento de bienes raíces urbanos, entendiéndose por tales los ubicados dentro del radio urbano respectivo, se regirá por las disposiciones especiales de esta ley y, en lo no previsto en ella, por el Código Civil.</div>
+        <div class="source-note">Se cita porque explica por qué, en lo que la ley especial no regula (como el reajuste de la renta), se aplica el Código Civil. La versión funcional mostrará el texto recuperado desde LeyChile, con enlace a la fuente.</div>
+      </div>
+    </section>
+
+    <!-- FUENTE: Código Civil art. 1545 -->
+    <section class="screen" id="screen-fuente-cc">
+      <button class="back-link" data-chat="arriendo">← Volver a la conversación</button>
+      <div class="source-card">
+        <span class="source-tag">Texto literal · LeyChile (BCN)</span>
+        <h2>Código Civil, artículo 1545</h2>
+        <div class="source-meta">Libro IV, Título XII: Del efecto de las obligaciones · Biblioteca del Congreso Nacional</div>
+        <div class="source-text">Todo contrato legalmente celebrado es una ley para los contratantes, y no puede ser invalidado sino por su consentimiento mutuo o por causas legales.</div>
+        <div class="source-note">La versión funcional mostrará el texto recuperado desde LeyChile, con enlace a la fuente.</div>
+      </div>
+    </section>
+
+    <!-- FICHA genérica de fuente aún no cargada -->
+    <section class="screen" id="screen-ficha">
+      <button class="back-link" data-goto="fuentes">← Volver a la biblioteca</button>
+      <div class="source-card ficha">
+        <span class="tag-warn" id="fichaEstadoTag"></span>
+        <h2 id="fichaTitulo"></h2>
+        <div class="source-meta" id="fichaMeta"></div>
+        <dl>
+          <dt>Tipo</dt><dd id="fichaTipo"></dd>
+          <dt>Origen</dt><dd id="fichaOrigen"></dd>
+          <dt>Licencia</dt><dd id="fichaLicencia"></dd>
+          <dt>Estado</dt><dd id="fichaEstado"></dd>
+        </dl>
+      </div>
+    </section>
+
+    <!-- HISTORIAL -->
+    <section class="screen" id="screen-historial">
+      <h2 class="section-title">Historial de consultas</h2>
+      <p class="section-sub">Cada consulta queda guardada con su respuesta, para volver a revisarla. Puedes borrarla cuando quieras.</p>
+      <div class="hist-list" id="histList">
+        <button class="hist-item" data-chat="arriendo">
+          <div><div class="hist-q">Mi arrendador quiere subirme el arriendo a mitad de contrato, ¿puede hacerlo?</div><div class="hist-date">Hoy, 10:42</div></div>
+          <span class="hist-status">2 fuentes</span>
+        </button>
+        <button class="hist-item" data-chat="despido">
+          <div><div class="hist-q">Me despidieron sin aviso previo, ¿qué me corresponde?</div><div class="hist-date">Ayer, 19:05</div></div>
+          <span class="hist-status">Ejemplo</span>
+        </button>
+        <button class="hist-item" data-chat="consumo">
+          <div><div class="hist-q">Compré algo con falla y la tienda no quiere devolverme la plata, ¿qué hago?</div><div class="hist-date">18 sept, 09:20</div></div>
+          <span class="hist-status">Ejemplo</span>
+        </button>
+      </div>
+      <div class="empty" id="histEmpty" style="display:none">Tu historial está vacío.</div>
+    </section>
+
+    <!-- BIBLIOTECA -->
+    <section class="screen" id="screen-fuentes">
+      <h2 class="section-title">Biblioteca de fuentes</h2>
+      <p class="section-sub">Articla solo responderá con lo que esté cargado en esta biblioteca: nada se inventa fuera de estas fuentes. Por ahora usamos solo el texto oficial de LeyChile, que es público. No usamos libros.</p>
+      <div class="sample-q" style="max-width:680px">
+        <button data-goto="fuente-cc">Código Civil — texto oficial, LeyChile (BCN) · ver artículo de ejemplo</button>
+        <button data-goto="fuente-arriendo">Ley 18.101 · Arrendamiento de predios urbanos — LeyChile · ver artículo de ejemplo</button>
+        <button data-ficha="trabajo">Código del Trabajo — texto oficial, LeyChile</button>
+        <button data-ficha="consumo">Ley 19.496 · Protección de los Derechos de los Consumidores — LeyChile</button>
+      </div>
+    </section>
+
+    <!-- CUENTA -->
+    <section class="screen" id="screen-cuenta">
+      <h2 class="section-title">Cuenta</h2>
+      <p class="section-sub">Pantalla de ejemplo: en el Hito 1 no hay cuentas reales.</p>
+      <div class="panel">
+        <h3>Tus datos</h3>
+        <div class="form-row"><label for="cuentaCorreo">Correo electrónico</label><input id="cuentaCorreo" type="email" placeholder="tu@correo.cl" disabled></div>
+        <div class="form-row"><label for="cuentaClave">Contraseña</label><input id="cuentaClave" type="password" placeholder="••••••••" disabled></div>
+        <p style="font-size:13px;">Para consultar no necesitas cuenta. Articla no te pide nombre, RUT ni dirección.</p>
+      </div>
+      <div class="panel">
+        <h3>Privacidad de tus consultas</h3>
+        <p>Tus consultas se guardan 90 días y puedes borrarlas cuando quieras.</p>
+        <button class="btn btn-danger" id="borrarHistorial" type="button">Borrar mi historial</button>
+        <p id="borradoMsg" style="display:none;margin-top:12px;color:var(--verified);font-weight:600;">Historial borrado.</p>
+      </div>
+    </section>
+
+    <!-- AVISO LEGAL -->
+    <section class="screen" id="screen-aviso">
+      <h2 class="section-title">Aviso legal</h2>
+      <p class="section-sub">Léelo antes de usar Articla.</p>
+      <div class="panel">
+        <h3>Esto no reemplaza a un abogado</h3>
+        <p>Articla entrega orientación jurídica general, basada en textos legales chilenos. No es asesoría legal ni crea una relación con un abogado o abogada.</p>
+        <ul>
+          <li>Puede cometer errores: verifica siempre el artículo citado en la fuente oficial (LeyChile).</li>
+          <li>Si tu caso tiene plazos, un juicio o un riesgo grave, consulta a un abogado o a una Corporación de Asistencia Judicial.</li>
+          <li>No escribas datos personales sensibles, como RUT, direcciones o datos de salud.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function(){
+  var QUESTIONS = {
+    arriendo: "Mi arrendador quiere subirme el arriendo a mitad de contrato, ¿puede hacerlo?",
+    despido: "Me despidieron sin aviso previo, ¿qué me corresponde?",
+    consumo: "Compré algo con falla y la tienda no quiere devolverme la plata, ¿qué hago?"
+  };
+  var FICHAS = {
+    trabajo: {titulo:"Código del Trabajo", meta:"Texto oficial · LeyChile (Biblioteca del Congreso Nacional)", tipo:"Código", origen:"LeyChile (BCN)", licencia:"Dominio público", estado:"Aún no cargada: se incorpora en el Hito 2."},
+    consumo: {titulo:"Ley N.º 19.496 · Protección de los Derechos de los Consumidores", meta:"Texto oficial · LeyChile (Biblioteca del Congreso Nacional)", tipo:"Ley", origen:"LeyChile (BCN)", licencia:"Dominio público", estado:"Aún no cargada: se incorpora en el Hito 2."}
+  };
+  var thread = document.getElementById('thread');
+  function el(tag, cls, html){ var e=document.createElement(tag); if(cls) e.className=cls; if(html!==undefined) e.innerHTML=html; return e; }
+  function userMsg(text){
+    var row = el('div','msg msg-row-user'); var b = el('div','msg-user'); b.textContent = text; row.appendChild(b); thread.appendChild(row);
+  }
+  function demoAnswer(){
+    var wrap = el('div','msg'); var a = el('div','msg-assistant');
+    a.innerHTML = 'En general, no puede hacerlo por su cuenta. Lo pactado en un contrato obliga a ambas partes como si fuera una ley, y solo puede modificarse por mutuo acuerdo o por causas legales. La ley especial de arrendamiento urbano no fija un tope ni un procedimiento para reajustar la renta: en lo que no regula, se aplica el Código Civil. Por eso, si tu contrato fijó un monto y un plazo, el arrendador no puede subir la renta unilateralmente, salvo que el propio contrato contemple una cláusula de reajuste. Revisa si el tuyo la incluye.'
+      + '<div class="cite-row"><button class="chip" data-goto="fuente-cc"><span class="dot"></span>Código Civil, art. 1545</button><button class="chip" data-goto="fuente-arriendo"><span class="dot"></span>Ley 18.101, art. 1</button></div>';
+    wrap.appendChild(a); thread.appendChild(wrap);
+    bind(wrap);
+  }
+  function noteBubble(text){ var w = el('div','msg'); w.appendChild(el('div','bubble-note',text)); thread.appendChild(w); }
+  function openChat(key){
+    thread.innerHTML = '';
+    userMsg(QUESTIONS[key]);
+    if(key === 'arriendo'){ demoAnswer(); }
+    else { noteBubble('Esta pregunta es un ejemplo: en el prototipo del Hito 1 aún no hay respuesta para ella. Cuando el motor esté conectado (Hito 2), aquí aparecerá la respuesta con sus artículos citados.'); }
+    show('chat');
+  }
+  function sendCustom(){
+    var input = document.getElementById('composerInput'); var t = input.value.trim();
+    if(!t) return;
+    userMsg(t); input.value='';
+    noteBubble('Esto es una demostración: todavía no hay un motor de IA conectado. En el Hito 2 aquí aparecerá la respuesta a tu pregunta, con sus artículos citados.');
+  }
+  function openFicha(key){
+    var f = FICHAS[key];
+    document.getElementById('fichaTitulo').textContent = f.titulo;
+    document.getElementById('fichaMeta').textContent = f.meta;
+    document.getElementById('fichaTipo').textContent = f.tipo;
+    document.getElementById('fichaOrigen').textContent = f.origen;
+    document.getElementById('fichaLicencia').textContent = f.licencia;
+    document.getElementById('fichaEstado').textContent = f.estado;
+    document.getElementById('fichaEstadoTag').textContent = 'Fuente prevista';
+    show('ficha');
+  }
+  function show(id){
+    document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+    var t = document.getElementById('screen-'+id);
+    if(t){ t.classList.add('active'); window.scrollTo(0,0); }
+    document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.screen === id); });
+  }
+  function bind(root){
+    root.querySelectorAll('[data-goto]').forEach(function(e){ e.addEventListener('click', function(){ show(e.dataset.goto); }); });
+  }
+  bind(document);
+  document.querySelectorAll('[data-chat]').forEach(function(e){ e.addEventListener('click', function(){ openChat(e.dataset.chat); }); });
+  document.querySelectorAll('[data-ficha]').forEach(function(e){ e.addEventListener('click', function(){ openFicha(e.dataset.ficha); }); });
+  document.querySelectorAll('.nav-btn').forEach(function(e){
+    e.addEventListener('click', function(){
+      if(e.dataset.screen === 'chat' && !thread.children.length){ openChat('arriendo'); } else { show(e.dataset.screen); }
+    });
+  });
+  document.getElementById('sendBtn').addEventListener('click', sendCustom);
+  document.getElementById('composerInput').addEventListener('keydown', function(ev){ if(ev.key === 'Enter'){ ev.preventDefault(); sendCustom(); } });
+  document.getElementById('borrarHistorial').addEventListener('click', function(){
+    document.getElementById('histList').style.display = 'none';
+    document.getElementById('histEmpty').style.display = 'block';
+    document.getElementById('borradoMsg').style.display = 'block';
+  });
+})();
+</script>
+</body>
+</html>
