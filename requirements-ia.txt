@@ -1,0 +1,2 @@
+# Búsqueda por significado (embeddings). Opcional fuera de Docker: sin esto la búsqueda usa solo palabras.
+fastembed>=0.4

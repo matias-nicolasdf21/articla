@@ -1,0 +1,26 @@
+digraph A {
+  graph [rankdir=LR, fontname="Helvetica", fontsize=18, label="Articla · Monolito modular por capas (Hito 2)", labelloc=t, fontcolor="#0B3D91", pad=0.3, nodesep=0.35, ranksep=0.55, dpi=200, compound=true];
+  node [fontname="Helvetica", fontsize=11, shape=box, style="rounded,filled", fillcolor="#F4F6FA", color="#33475B"];
+  edge [fontname="Helvetica", fontsize=9, color="#33475B"];
+  cliente [label="Cliente HTTP\nPostman · Swagger /docs\n(Hito 3: Next.js)", fillcolor="#FFF4E0", color="#B26A00"];
+  subgraph cluster_api {
+    label="Proceso único: FastAPI + Uvicorn (app/)"; style="rounded,dashed"; color="#0033A0"; fontcolor="#0033A0"; fontsize=12;
+    main [label="main.py\nmanejo de errores → JSON"];
+    r [label="routers/\nHTTP ↔ servicio", fillcolor="#E3ECFA"];
+    s [label="services/\nreglas de negocio", fillcolor="#E6F2E6"];
+    rp [label="repositories/\nSQL", fillcolor="#FBEFE0"];
+    sc [label="schemas/\ncontratos Pydantic", shape=note, fillcolor="#FFFFFF"];
+    db [label="database.py · config.py\nconexión y .env", shape=note, fillcolor="#FFFFFF"];
+  }
+  pg [label="PostgreSQL 16 + pgvector\n(Docker Compose)", shape=cylinder, fillcolor="#E8EEF7", color="#0033A0"];
+  subgraph cluster_ing {
+    label="Ingesta (fuera de la API)"; style="rounded,dashed"; color="#2E7D32"; fontcolor="#2E7D32"; fontsize=12;
+    xml [label="XML oficial\nLeyChile (BCN)", shape=folder, fillcolor="#FFFFFF"];
+    ing [label="ingesta/leychile.py\nscripts/cargar_leychile.py"];
+  }
+  cliente -> r [label=" JSON /api/v1 "];
+  r -> s; s -> rp; rp -> pg [label=" psycopg 3 "];
+  r -> sc [style=dotted, arrowhead=none]; rp -> db [style=dotted, arrowhead=none];
+  main -> r [style=dotted, arrowhead=none];
+  xml -> ing -> pg [label=" carga "];
+}

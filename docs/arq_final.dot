@@ -1,0 +1,19 @@
+digraph A {
+  graph [rankdir=LR, fontname="Helvetica", fontsize=18, label="Articla · Arquitectura final (docker compose)", labelloc=t, fontcolor="#0B3D91", pad=0.3, nodesep=0.4, ranksep=0.6, dpi=200];
+  node [fontname="Helvetica", fontsize=11, shape=box, style="rounded,filled", fillcolor="#F4F6FA", color="#33475B"];
+  edge [fontname="Helvetica", fontsize=9, color="#33475B"];
+  user [label="Navegador\n(persona usuaria)", shape=ellipse, fillcolor="#FFF4E0", color="#B26A00"];
+  subgraph cluster_web { label="contenedor web · :3000"; style="rounded,dashed"; color="#7C5E1E"; fontcolor="#7C5E1E";
+    web [label="Next.js (React)\npantallas + validación\n/api/v1/* → puente"]; }
+  subgraph cluster_api { label="contenedor api · :8000"; style="rounded,dashed"; color="#0033A0"; fontcolor="#0033A0";
+    r [label="routers", fillcolor="#E3ECFA"]; s [label="services\n(RAG + validación\nde citas)", fillcolor="#E6F2E6"]; rp [label="repositories\n(SQL)", fillcolor="#FBEFE0"];
+    emb [label="ia/embeddings\nMiniLM multilingüe\n(local, 384 dim)", shape=component, fillcolor="#FFFFFF"];
+    gem [label="ia/gemini\ncliente con reintentos\ny respaldo", shape=component, fillcolor="#FFFFFF"]; }
+  subgraph cluster_db { label="contenedor db · :5432"; style="rounded,dashed"; color="#2E7D32"; fontcolor="#2E7D32";
+    pg [label="PostgreSQL 16 + pgvector\nvolumen pgdata", shape=cylinder, fillcolor="#E8F1EB"]; }
+  google [label="Google Gemini API\n(externo)", shape=ellipse, fillcolor="#F2F2F2"];
+  bcn [label="LeyChile / datos.bcn.cl\n(externo, solo ingesta)", shape=ellipse, fillcolor="#F2F2F2"];
+  user -> web [label=" HTTP "]; web -> r [label=" JSON /api/v1 "]; r -> s; s -> rp; rp -> pg [label=" psycopg 3 "];
+  s -> emb [style=dashed]; s -> gem [style=dashed]; gem -> google [label=" HTTPS + clave "];
+  bcn -> pg [label=" scripts/ (ETL) ", style=dotted];
+}

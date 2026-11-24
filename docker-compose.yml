@@ -1,0 +1,57 @@
+# Levanta Articla completo con un solo comando:  docker compose up --build
+#   db  : PostgreSQL 16 + pgvector (crea las tablas desde db/schema.sql la primera vez)
+#   api : FastAPI en http://localhost:8000 (carga el corpus y calcula embeddings al iniciar)
+#   web : Next.js en http://localhost:3000 (la interfaz)
+#   tunel (opcional, perfil "publico"): dirección pública temporal de Cloudflare para presentar
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 3s
+      retries: 20
+
+  api:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      CORS_ORIGINS: http://localhost:3000
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data        # los XML descargados quedan en tu carpeta data/
+
+  web:
+    build: ./web
+    environment:
+      API_URL: http://api:8000
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+
+  # Dirección pública temporal para mostrar Articla desde otro lugar (no parte por defecto).
+  #   docker compose --profile publico up -d      y luego   docker compose logs tunel
+  # Cloudflare entrega una dirección https://<algo>.trycloudflare.com mientras este PC esté encendido.
+  tunel:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --url http://web:3000
+    depends_on:
+      - web
+    profiles: ["publico"]
+
+volumes:
+  pgdata:

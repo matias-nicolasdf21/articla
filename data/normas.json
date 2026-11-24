@@ -1,0 +1,17 @@
+[
+  {"id": 172986, "archivo": "codigo_civil.xml", "identificador": "Codigo Civil", "tipo": "codigo", "titulo": "Código Civil de Chile", "parte_raiz": "2", "verificada": true},
+  {"id": 29526, "archivo": "ley_18101.xml", "identificador": "Ley 18.101", "tipo": "ley", "titulo": "Ley 18.101 · Fija normas especiales sobre arrendamiento de predios urbanos", "parte_raiz": null, "verificada": true},
+  {"id": 207436, "archivo": "codigo_trabajo.xml", "identificador": "Codigo del Trabajo", "tipo": "codigo", "titulo": "Código del Trabajo", "parte_raiz": null, "verificada": false},
+  {"id": 1160403, "archivo": "ley_19496.xml", "identificador": "Ley 19.496", "tipo": "ley", "titulo": "Ley 19.496 · Protección de los Derechos de los Consumidores", "parte_raiz": null, "verificada": false},
+  {"id": 1984, "archivo": "codigo_penal.xml", "identificador": "Codigo Penal", "tipo": "codigo", "titulo": "Código Penal", "parte_raiz": null, "verificada": false},
+  {"id": 1974, "archivo": "codigo_comercio.xml", "identificador": "Codigo de Comercio", "tipo": "codigo", "titulo": "Código de Comercio", "parte_raiz": null, "verificada": false},
+  {"id": 22740, "archivo": "codigo_procedimiento_civil.xml", "identificador": "Codigo de Procedimiento Civil", "tipo": "codigo", "titulo": "Código de Procedimiento Civil", "parte_raiz": null, "verificada": false},
+  {"id": 176595, "archivo": "codigo_procesal_penal.xml", "identificador": "Codigo Procesal Penal", "tipo": "codigo", "titulo": "Código Procesal Penal", "parte_raiz": null, "verificada": false},
+  {"id": 141599, "archivo": "ley_19628.xml", "identificador": "Ley 19.628", "tipo": "ley", "titulo": "Ley 19.628 · Protección de la vida privada", "parte_raiz": null, "verificada": false},
+  {"id": 242302, "archivo": "constitucion.xml", "identificador": "Constitucion Politica", "tipo": "codigo", "titulo": "Constitución Política de la República", "parte_raiz": null, "verificada": false},
+  {"id": 172986, "archivo": "codigo_civil.xml", "identificador": "Ley 14.908", "tipo": "ley", "titulo": "Ley 14.908 · Abandono de familia y pago de pensiones alimenticias (texto refundido)", "parte_raiz": "7", "verificada": false},
+  {"id": 172986, "archivo": "codigo_civil.xml", "identificador": "Ley 16.618", "tipo": "ley", "titulo": "Ley 16.618 · Ley de Menores (texto refundido)", "parte_raiz": "6", "verificada": false},
+  {"id": 172986, "archivo": "codigo_civil.xml", "identificador": "Ley 4.808", "tipo": "ley", "titulo": "Ley 4.808 · Ley sobre Registro Civil (texto refundido)", "parte_raiz": "3", "verificada": false},
+  {"id": 172986, "archivo": "codigo_civil.xml", "identificador": "Ley 17.344", "tipo": "ley", "titulo": "Ley 17.344 · Autoriza cambio de nombres y apellidos (texto refundido)", "parte_raiz": "4", "verificada": false},
+  {"id": 172986, "archivo": "codigo_civil.xml", "identificador": "Ley 16.271", "tipo": "ley", "titulo": "Ley 16.271 · Impuesto a las herencias, asignaciones y donaciones (texto refundido)", "parte_raiz": "8", "verificada": false}
+]

@@ -1,0 +1,38 @@
+digraph G {
+  graph [rankdir=TB, fontname="Helvetica", fontsize=20, label="Articla · Modelo de datos (Hito 2)", labelloc=t, fontcolor="#0B3D91", nodesep=0.6, ranksep=1.0, pad=0.3, dpi=200];
+  node [shape=plaintext, fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=10, color="#33475B", arrowhead=crow, arrowtail=tee, dir=both];
+  fuentes [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="5" color="#0033A0">
+    <tr><td bgcolor="#0033A0" colspan="2"><font color="white"><b>fuentes</b></font></td></tr>
+    <tr><td align="left"><b>PK</b> id</td><td align="left">SERIAL</td></tr>
+    <tr><td align="left">tipo</td><td align="left">VARCHAR(20) CHECK ley|codigo|libro</td></tr>
+    <tr><td align="left">identificador</td><td align="left">VARCHAR(100) UNIQUE</td></tr>
+    <tr><td align="left">titulo</td><td align="left">VARCHAR(300)</td></tr>
+    <tr><td align="left">url_oficial</td><td align="left">TEXT</td></tr>
+    <tr><td align="left">licencia</td><td align="left">VARCHAR(60) def. 'dominio publico'</td></tr>
+    <tr><td align="left">creada_en</td><td align="left">TIMESTAMPTZ</td></tr></table>>];
+  fragmentos [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="5" color="#2E7D32">
+    <tr><td bgcolor="#2E7D32" colspan="2"><font color="white"><b>fragmentos</b></font></td></tr>
+    <tr><td align="left"><b>PK</b> id</td><td align="left">SERIAL</td></tr>
+    <tr><td align="left"><b>FK</b> fuente_id</td><td align="left">INTEGER → fuentes ON DELETE CASCADE</td></tr>
+    <tr><td align="left">articulo</td><td align="left">VARCHAR(100)</td></tr>
+    <tr><td align="left">texto</td><td align="left">TEXT (índice GIN spanish)</td></tr>
+    <tr><td align="left">ubicacion</td><td align="left">TEXT</td></tr>
+    <tr><td align="left">fecha_version</td><td align="left">DATE</td></tr>
+    <tr><td align="left">embedding</td><td align="left">vector(384) (índice HNSW)</td></tr></table>>];
+  consultas [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="5" color="#0033A0">
+    <tr><td bgcolor="#0033A0" colspan="2"><font color="white"><b>consultas</b></font></td></tr>
+    <tr><td align="left"><b>PK</b> id</td><td align="left">SERIAL</td></tr>
+    <tr><td align="left">pregunta</td><td align="left">TEXT CHECK largo ≥ 5</td></tr>
+    <tr><td align="left">respuesta</td><td align="left">TEXT</td></tr>
+    <tr><td align="left">util</td><td align="left">BOOLEAN (nulo = sin opinión)</td></tr>
+    <tr><td align="left">creada_en</td><td align="left">TIMESTAMPTZ</td></tr></table>>];
+  citas [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="5" color="#B26A00">
+    <tr><td bgcolor="#B26A00" colspan="2"><font color="white"><b>consulta_citas</b></font></td></tr>
+    <tr><td align="left"><b>PK, FK</b> consulta_id</td><td align="left">INTEGER → consultas</td></tr>
+    <tr><td align="left"><b>PK, FK</b> fragmento_id</td><td align="left">INTEGER → fragmentos</td></tr></table>>];
+  fuentes -> fragmentos [label=" 1 : N "];
+  fragmentos -> citas [label=" 1 : N "];
+  consultas -> citas [label=" 1 : N "];
+  {rank=same; fuentes; consultas}
+}

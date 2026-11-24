@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+web/node_modules/
+web/.next/
+data/leychile_todas/
+*CONFIDENCIAL*
+respaldos/
+data/normas_*.json
+data/descarga.log
