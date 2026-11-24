@@ -62,6 +62,19 @@ BATERIA = [
 ]
 
 
+# Datos que la respuesta DEBE decir (cualquiera de las variantes), para detectar textos desactualizados
+# como el de la garantía legal (3 meses en la ficha antigua de la Ley 19.496; 6 meses desde la Ley 21.398).
+# Cifras vigentes a noviembre de 2026; si una ley cambia, se actualizan aquí.
+HECHOS = {
+    "¿Cuántos días de vacaciones me corresponden al año?": ["15 dias habiles", "quince dias habiles"],
+    "Me despidieron sin causa justificada, ¿cuánto me tienen que pagar de indemnización?": ["30 dias", "treinta dias"],
+    "¿Cuántas horas a la semana puedo trabajar como máximo?": ["42 horas", "cuarenta y dos horas"],
+    "¿En cuántos días me tienen que pagar el finiquito?": ["10 dias habiles", "diez dias habiles"],
+    "Compré algo por internet y me arrepentí, ¿lo puedo devolver?": ["10 dias", "diez dias"],
+    "El producto que compré salió malo a la semana, ¿qué puedo exigir?": ["seis meses", "6 meses"],
+}
+
+
 def _norma(texto: str) -> str:
     """'Código del Trabajo (idNorma 207436)' -> 'codigo del trabajo'; 'Ley 14.908' -> 'ley 14908'."""
     t = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode().lower()
@@ -117,24 +130,28 @@ def main() -> None:
             citas = c.get("citas", [])
             ok_norma = any(_norma(x["fuente"]).startswith(n) for x in citas for n in normas)
             ok_art = _acierta_articulo(citas, normas, esperados) if esperados else None
+            hechos = HECHOS.get(pregunta)
+            ok_dato = any(h in _norma(c.get("respuesta") or "") for h in hechos) if hechos else None
             fila = {"n": i, "pregunta": pregunta, "modo": c.get("modo"), "segundos": round(seg, 1),
-                    "norma": ok_norma, "articulo": ok_art,
+                    "norma": ok_norma, "articulo": ok_art, "dato": ok_dato,
                     "citas": [f"{x['fuente']} {x['articulo']}" for x in citas]}
             filas.append(fila)
             marca = lambda v: "-" if v is None else ("sí" if v else "NO")
-            print(f"{i:2}. norma {marca(ok_norma):2} | artículo {marca(ok_art):2} | {fila['modo']:10} | "
+            print(f"{i:2}. norma {marca(ok_norma):2} | artículo {marca(ok_art):2} | dato {marca(ok_dato):2} | {fila['modo']:10} | "
                   f"{seg:5.1f} s | {pregunta}")
             if i < len(bateria):
                 time.sleep(PAUSA_S)
 
     n = len(filas)
     con_art = [f for f in filas if f["articulo"] is not None]
+    con_dato = [f for f in filas if f["dato"] is not None]
     ia = [f for f in filas if f["modo"] == "ia"]
     tiempos = sorted(f["segundos"] for f in ia) or [0]
     resumen = {
         "fecha": date.today().isoformat(), "pensamiento": llm.nivel, "preguntas": n,
         "norma_correcta": sum(f["norma"] for f in filas),
         "articulo_correcto": sum(f["articulo"] for f in con_art), "con_articulo_esperado": len(con_art),
+        "dato_correcto": sum(f["dato"] for f in con_dato), "con_dato_esperado": len(con_dato),
         "redactadas_con_ia": len(ia),
         "tiempo_promedio_ia_s": round(sum(tiempos) / len(tiempos), 1),
         "tiempo_mediana_ia_s": tiempos[len(tiempos) // 2],
@@ -142,6 +159,8 @@ def main() -> None:
     pct = lambda a, b: f"{(100 * a / b):.0f} %" if b else "-"
     print(f"\nResumen (pensamiento de Gemini: {llm.nivel})")
     print(f"  Norma correcta:     {resumen['norma_correcta']}/{n} ({pct(resumen['norma_correcta'], n)})")
+    print(f"  Dato clave:         {resumen['dato_correcto']}/{len(con_dato)} "
+          f"({pct(resumen['dato_correcto'], len(con_dato))})  (plazos y cifras vigentes)")
     print(f"  Artículo correcto:  {resumen['articulo_correcto']}/{len(con_art)} "
           f"({pct(resumen['articulo_correcto'], len(con_art))})")
     print(f"  Redactadas con IA:  {len(ia)}/{n}")
@@ -155,13 +174,14 @@ def main() -> None:
     si = lambda v: "—" if v is None else ("Sí" if v else "No")
     lineas = [f"# Evaluación de Articla ({resumen['fecha']}, pensamiento: {llm.nivel})", "",
               f"- Norma correcta: **{resumen['norma_correcta']}/{n}** ({pct(resumen['norma_correcta'], n)})",
+              f"- Dato clave vigente: **{resumen['dato_correcto']}/{len(con_dato)}**",
               f"- Artículo exacto: **{resumen['articulo_correcto']}/{len(con_art)}** "
               f"({pct(resumen['articulo_correcto'], len(con_art))})",
               f"- Redactadas con IA: {len(ia)}/{n}",
               f"- Tiempo con IA: promedio {resumen['tiempo_promedio_ia_s']} s, mediana {resumen['tiempo_mediana_ia_s']} s",
-              "", "| # | Pregunta | Norma | Artículo | Modo | Tiempo | Citas |", "|---|---|---|---|---|---|---|"]
+              "", "| # | Pregunta | Norma | Artículo | Dato | Modo | Tiempo | Citas |", "|---|---|---|---|---|---|---|---|"]
     for f_ in filas:
-        lineas.append(f"| {f_['n']} | {f_['pregunta']} | {si(f_['norma'])} | {si(f_['articulo'])} | "
+        lineas.append(f"| {f_['n']} | {f_['pregunta']} | {si(f_['norma'])} | {si(f_['articulo'])} | {si(f_['dato'])} | "
                       f"{f_['modo']} | {f_['segundos']} s | {'; '.join(f_['citas'])} |")
     with open(os.path.join(base, f"evaluacion{sufijo}.md"), "w", encoding="utf-8") as f:
         f.write("\n".join(lineas) + "\n")
